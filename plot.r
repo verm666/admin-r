@@ -34,13 +34,15 @@ if (o$filename != "stdin" && file.access(o$filename, mode=4) == -1) {
 }
 
 d <- data.table(read.table(o$filename, sep=" ", ))
+cols_count = ncol(d)
 
 if (o$columns != "all") {
   cols = as.numeric(strsplit(o$columns, ",")[[1]])
   d <- d[, cols, with=FALSE]
+} else {
+  cols = seq(from=2, to=cols_count)
 }
 
-cols_count = ncol(d)
 
 d$V1 <- round(d$V1 / o$scale) * o$scale
 

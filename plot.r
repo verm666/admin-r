@@ -12,8 +12,10 @@ option_list <- list(
     default="x"),
   make_option(c("-y", "--ylab"), action="store", dest="ylab", type="character",
     default="y"),
-  make_option(c("-t", "--title"), action="store", dest="title", type="character",
-    default="title")
+  make_option(c("-t", "--title"), action="store", dest="title",
+    type="character", default="title"),
+  make_option(c("-c", "--columns"), action="store", dest="columns",
+    type="character", default="all")
 )
 
 # input file format
@@ -32,13 +34,21 @@ if (o$filename != "stdin" && file.access(o$filename, mode=4) == -1) {
 }
 
 d <- data.table(read.table(o$filename, sep=" ", ))
-values_count = ncol(d)
+
+if (o$columns != "all") {
+  cols = as.numeric(strsplit(o$columns, ",")[[1]])
+  d <- d[, cols, with=FALSE]
+}
+
+cols_count = ncol(d)
 
 d$V1 <- round(d$V1 / o$scale) * o$scale
 
-for (i in seq(from=2, to=values_count)) {
-  col_name = paste("V", i, sep="")
-  d <- d[, sum(get(col_name) / o$scale), by=V1]
+for (i in seq(from=2, to=cols_count)) {
+  if (is.element(i, cols)) {
+    col_name = paste("V", i, sep="")
+    d <- d[, sum(get(col_name) / o$scale), by=V1]
+  }
 }
 
 d$V1 <- as.POSIXct(origin="1970-01-01", d$V1)

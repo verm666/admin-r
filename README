@@ -1,7 +1,0 @@
-* plot.r - рисует график из исходного csv файла, в котором первый столбец
-unix timestamp, второй - значение.
-
-Зависимости:
- * R;
- * R-package ggplot2;
- * R-package optparse;

@@ -94,7 +94,7 @@
 
 В данном случае последний график эквивалентен вызову plot.r без аргумента -c.
 
-Пример графика из последнего примера:
+Графика из последнего примера:
 ![alt text] [plot]
 
 [plot]: https://github.com/verm666/admin-r/blob/master/examples/1.png?raw=true "Plot example"

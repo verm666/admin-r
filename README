@@ -3,6 +3,5 @@ unix timestamp, второй - значение.
 
 Зависимости:
  * R;
- * R-package data.table;
- * R-package getopt;
+ * R-package ggplot2;
  * R-package optparse;

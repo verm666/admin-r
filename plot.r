@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(optparse)
-library(data.table)
+suppressMessages(require(ggplot2))
+suppressMessages(require(reshape))
+suppressMessages(library(optparse))
 
 option_list <- list(
   make_option(c("-f", "--filename"), action="store", dest="filename",
@@ -33,30 +34,31 @@ if (o$filename != "stdin" && file.access(o$filename, mode=4) == -1) {
   stop(sprintf("could not open file: %s", o$filename))
 }
 
-d <- data.table(read.table(o$filename, sep=" ", ))
-cols_count = ncol(d)
+d <- read.table(o$filename, sep=" ")
 
-if (o$columns != "all") {
-  cols = as.numeric(strsplit(o$columns, ",")[[1]])
-  d <- d[, cols, with=FALSE]
+if (o$columns == "all") {
+  useful_columns = seq(from=2, to=ncol(d))
 } else {
-  cols = seq(from=2, to=cols_count)
+  useful_columns = as.numeric(strsplit(o$columns, ",")[[1]])
 }
 
-
+# scale timestamp
 d$V1 <- round(d$V1 / o$scale) * o$scale
+dn <- data.frame(unique(d$V1))
+colnames(dn)[1] <- 'time'
 
-for (i in seq(from=2, to=cols_count)) {
-  if (is.element(i, cols)) {
-    col_name = paste("V", i, sep="")
-    d <- d[, sum(get(col_name) / o$scale), by=V1]
-  }
+# scale values
+for (i in useful_columns) {
+  col_name <- paste("V", i, sep="")
+  dn[col_name] <- c(aggregate(d[, col_name], by=list(d$V1), sum)["x"])
 }
 
-d$V1 <- as.POSIXct(origin="1970-01-01", d$V1)
+dn[1] <- as.POSIXct(origin="1970-01-01", dn[, 1])
+dn <- melt(dn, id = 'time', variable_name = 'series')
 
+# plot
 X11()
-plot(d, type="l", xlab=o$xlab, ylab=o$ylab, main=o$title)
+ggplot(dn, aes(time, value)) + geom_line(aes(colour = series))
 
 write("press `ctrl+c` for exit", stderr())
 while (T) {

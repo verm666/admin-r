@@ -54,11 +54,13 @@ for (i in useful_columns) {
 }
 
 dn[1] <- as.POSIXct(origin="1970-01-01", dn[, 1])
-dn <- melt(dn, id = 'time', variable_name = 'series')
+dn <- melt(dn, id = 'time', variable_name = 'Legend')
 
 # plot
 X11()
-ggplot(dn, aes(time, value)) + geom_line(aes(colour = series))
+ggplot(dn, aes(time, value)) +
+  geom_line(aes(colour = Legend)) +
+  labs(x=o$xlab, y=o$ylab, title=o$title)
 
 write("press `ctrl+c` for exit", stderr())
 while (T) {

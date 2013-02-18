@@ -50,7 +50,7 @@ colnames(dn)[1] <- 'time'
 # scale values
 for (i in useful_columns) {
   col_name <- paste("V", i, sep="")
-  dn[col_name] <- c(aggregate(d[, col_name], by=list(d$V1), sum)["x"])
+  dn[col_name] <- c(aggregate((d[, col_name] / o$scale), by=list(d$V1), sum)["x"])
 }
 
 dn[1] <- as.POSIXct(origin="1970-01-01", dn[, 1])
